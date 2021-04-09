@@ -1,3 +1,5 @@
+djangorestframework==3.12.4
+markdown==3.3.4
 appdirs==1.4.4
 asgiref==3.3.4
 certifi==2020.12.5
@@ -17,5 +19,5 @@ six==1.15.0
 sqlparse==0.4.1
 toml==0.10.2
 urllib3==1.26.4
-virtualenv==20.4.3
+djangorestframework-simplejwt==4.6.0
 psycopg2-binary>=2.8
