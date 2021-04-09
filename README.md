@@ -48,3 +48,8 @@ docker-compose up
 `docker-compose exec web python manage.py createsuperuser`.
 
 Админ панель доступна тут: [http://127.0.0.1:8000/admin/](http://127.0.0.1:8000/admin/)
+
+Новые миграции добавляются и актуализируются командой
+```bash
+docker-compose exec web python manage.py makemigrations backend
+```

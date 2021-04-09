@@ -1,3 +1,5 @@
+djangorestframework==3.12.4
+markdown==3.3.4
 appdirs==1.4.4
 asgiref==3.3.4
 certifi==2020.12.5
