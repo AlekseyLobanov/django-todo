@@ -27,7 +27,8 @@ SECRET_KEY = "django-insecure-toz+*lt(ejm!l*)92w2ciqoh^1kz#a(abbpcn54-dbw(nxoy&7
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
+if DEBUG: 
+    ALLOWED_HOSTS = ["0.0.0.0"]   
 
 # Application definition
 
@@ -40,7 +41,18 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework",
+    "drf_yasg",
 ]
+
+SWAGGER_SETTINGS = {
+   'SECURITY_DEFINITIONS': {
+        'Bearer': {
+            'type': 'apiKey',
+            'name': 'Authorization',
+            'in': 'header'
+        }
+    }
+}
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
