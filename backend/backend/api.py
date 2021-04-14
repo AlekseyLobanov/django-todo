@@ -13,7 +13,7 @@ class ToDoListSerializer(serializers.HyperlinkedModelSerializer):
 class ToDoListViewSet(viewsets.ModelViewSet):
     queryset = ToDoList.objects.all()
     serializer_class = ToDoListSerializer
-    #permission_classes = [permissions.IsAuthenticated] TODO раскомментировать и сделать авторизацию
+    permission_classes = [permissions.IsAuthenticated]
 
 
 router = routers.DefaultRouter()
