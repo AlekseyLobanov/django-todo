@@ -1,11 +1,19 @@
-from api import User, CODE_SUCCESS
+from api import User
+
+
+def ignore_exceptions(*args, **argv):
+    try:
+        args[0](*(args[1:]), **argv)
+    except Exception as e:
+        print(e)
+
 
 user = User()
 print("testing api methods...")
-print("auth...", user.auth("root", "root") == CODE_SUCCESS)
-print("list...", user.list()[0] == CODE_SUCCESS)
-print("create...", user.create()[0] == CODE_SUCCESS)
-print("read...", user.read(id=0)[0] == CODE_SUCCESS)
-print("update...", user.update(id=0, title="Title")[0] == CODE_SUCCESS)
-print("partial_update...", user.partial_update(id=0, title="Title")[0] == CODE_SUCCESS)
-print("delete...", user.update(id=0)[0] == CODE_SUCCESS)
+print("auth..."), ignore_exceptions(user.auth, "root", "root")
+print("list..."), ignore_exceptions(user.list)
+print("create..."), ignore_exceptions(user.create)
+print("read..."), ignore_exceptions(user.read, id=0)
+print("update..."), ignore_exceptions(user.update, id=0, title="Title")
+print("partial_update..."), ignore_exceptions(user.partial_update, id=0, title="Title")
+print("delete..."), ignore_exceptions(user.update, id=0)
