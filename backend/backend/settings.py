@@ -27,8 +27,8 @@ SECRET_KEY = "django-insecure-toz+*lt(ejm!l*)92w2ciqoh^1kz#a(abbpcn54-dbw(nxoy&7
 DEBUG = True
 
 ALLOWED_HOSTS = []
-if DEBUG: 
-    ALLOWED_HOSTS = ["0.0.0.0"]   
+if DEBUG:
+    ALLOWED_HOSTS = ["0.0.0.0", "localhost", "127.0.0.1"]
 
 # Application definition
 
@@ -45,13 +45,7 @@ INSTALLED_APPS = [
 ]
 
 SWAGGER_SETTINGS = {
-   'SECURITY_DEFINITIONS': {
-        'Bearer': {
-            'type': 'apiKey',
-            'name': 'Authorization',
-            'in': 'header'
-        }
-    }
+    "SECURITY_DEFINITIONS": {"Bearer": {"type": "apiKey", "name": "Authorization", "in": "header"}}
 }
 
 MIDDLEWARE = [
@@ -130,7 +124,12 @@ SIMPLE_JWT = {
 }
 
 REST_FRAMEWORK = {
-    "DEFAULT_AUTHENTICATION_CLASSES": ("rest_framework_simplejwt.authentication.JWTAuthentication",)
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ),
+    "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"],
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
+    "PAGE_SIZE": 100,
 }
 
 
