@@ -1,17 +1,27 @@
+from types import SimpleNamespace
 import urllib
 import requests
 
 DEFAULT_URL = "http://127.0.0.1:8000"
+
+API_TODO_ITEMS_LIST = "api/todo_items/"
+API_TODO_ITEMS_CREATE = "api/todo_items/"
+API_TODO_ITEMS_READ = "api/todo_items/{0}/"
+API_TODO_ITEMS_UPDATE = "api/todo_items/{0}/"
+API_TODO_ITEMS_PARTIAL_UPDATE = "api/todo_items/{0}/"
+API_TODO_ITEMS_DELETE = "api/todo_items/{0}/"
+
 API_LISTS_LIST = "api/lists/"
 API_LISTS_CREATE = "api/lists/"
 API_LISTS_READ = "lists/{0}/"
 API_LISTS_UPDATE = "lists/{0}/"
 API_LISTS_PARTIAL_UPDATE = "lists/{0}/"
 API_LISTS_DELETE = "lists/{0}/"
+
 API_TOKEN = "api/token/"
 
 
-class User(object):
+class UserApi(object):
     def __init__(self, url=DEFAULT_URL, token=None):
         """
         Constructor
@@ -50,14 +60,13 @@ class User(object):
             Generated auth token.
 
         """
-        url = self.get_api(API_TOKEN)
-        data = {"username": user, "password": passwd}
-        response = requests.post(url=url, json=data)
-        response.raise_for_status()
-        self.token = response.json()
+        token = UserApi._raise_or_return_(
+            requests.post(url=self.get_api(API_TOKEN), json={"username": user, "password": passwd})
+        )
+        self.token = SimpleNamespace(**token)
         return self.token
 
-    def list(self):
+    def lists_list(self, **argv):
         """
         List all the exsiting to-do lists.
         Auth required
@@ -68,13 +77,16 @@ class User(object):
             to-do lists.
 
         """
-        response = requests.get(url=self.get_api(API_LISTS_LIST), headers=self._access_token_())
-        response.raise_for_status()
-        return response.json()
+        return UserApi._raise_or_return_(
+            requests.get(
+                url=self.get_api(API_LISTS_LIST), headers=self._access_token_(), params=argv
+            )
+        )
 
-    def create(self, title="Untitled"):
+    def lists_create(self, title="Untitled"):
         """
         Create a new to-do list
+        Auth required
 
         Parameters
         ----------
@@ -82,83 +94,125 @@ class User(object):
             New list name. The default is "Untitled".
 
         """
-        response = requests.post(
-            url=self.get_api(API_LISTS_CREATE), json={"title": title}, headers=self._access_token_()
+        return UserApi._raise_or_return_(
+            requests.post(
+                url=self.get_api(API_LISTS_CREATE),
+                json={"title": title},
+                headers=self._access_token_(),
+            )
         )
-        response.raise_for_status()
-        return response.json()
 
-    def read(self, id):
+    def todo_items_list(self, **argv):
         """
-        Read a to-do list contents
-
-        Parameters
-        ----------
-        id : int
-            List id.
+        List all the exsiting to-do items.
+        Auth required
 
         Returns
         -------
         list
-            Requested contents
+            to-do items.
 
         """
-        response = requests.post(
-            url=self.get_api(API_LISTS_READ).format(id), headers=self._access_token_()
+        return UserApi._raise_or_return_(
+            requests.get(
+                url=self.get_api(API_TODO_ITEMS_LIST), headers=self._access_token_(), params=argv
+            )
         )
-        response.raise_for_status()
-        return response.json()
 
-    def update(self, id, title="Untitled"):
-        """
-        Add a to-do item to the list
+    # def create(self, title="Untitled"):
+    # """
+    # Create a new to-do list
+    # Auth required
 
-        Parameters
-        ----------
-        id : int
-            List id.
-        title : str, optional
-            To-do item title. The default is "Untitled".
+    # Parameters
+    # ----------
+    # title : str, optional
+    # New list name. The default is "Untitled".
 
-        """
-        response = requests.put(
-            json={"title": title},
-            url=self.get_api(API_LISTS_UPDATE).format(id),
-            headers=self._access_token_(),
-        )
-        response.raise_for_status()
-        return response.json()
+    # """
+    # response = requests.post(
+    # url=self.get_api(API_LISTS_CREATE), json={"title": title}, headers=self._access_token_()
+    # url=self.get_api(API_TODO_ITEMS_CREATE), json={"title": title}, headers=self._access_token_()
+    # )
+    # response.raise_for_status()
+    # return response.json()
 
-    def partial_update(self, id, title="Untitled"):
-        """
-        Update list item - untrusted
+    # def read(self, id):
+    # """
+    # Read a to-do list contents
 
-        """
-        response = requests.patch(
-            json={"title": title},
-            url=self.get_api(API_LISTS_PARTIAL_UPDATE).format(id),
-            headers=self._access_token_(),
-        )
-        response.raise_for_status()
-        return response.json()
+    # Parameters
+    # ----------
+    # id : int
+    # List id.
 
-    def delete(self, id):
-        """
-        Delete list
+    # Returns
+    # -------
+    # list
+    # Requested contents
 
-        Parameters
-        ----------
-        id : int
-            List id to delete.
+    # """
+    # response = requests.post(
+    # url=self.get_api(API_LISTS_READ).format(id), headers=self._access_token_()
+    # )
+    # response.raise_for_status()
+    # return response.json()
 
-        """
-        response = requests.delete(
-            url=self.get_api(API_LISTS_DELETE).format(id), headers=self._access_token_()
-        )
-        response.raise_for_status()
-        return response.json()
+    # def update(self, id, title="Untitled"):
+    # """
+    # Add a to-do item to the list
+
+    # Parameters
+    # ----------
+    # id : int
+    # List id.
+    # title : str, optional
+    # To-do item title. The default is "Untitled".
+
+    # """
+    # response = requests.put(
+    # json={"title": title},
+    # url=self.get_api(API_LISTS_UPDATE).format(id),
+    # headers=self._access_token_(),
+    # )
+    # response.raise_for_status()
+    # return response.json()
+
+    # def partial_update(self, id, title="Untitled"):
+    # """
+    # Update list item - untrusted
+
+    # """
+    # response = requests.patch(
+    # json={"title": title},
+    # url=self.get_api(API_LISTS_PARTIAL_UPDATE).format(id),
+    # headers=self._access_token_(),
+    # )
+    # response.raise_for_status()
+    # return response.json()
+
+    # def delete(self, id):
+    # """
+    # Delete list
+
+    # Parameters
+    # ----------
+    # id : int
+    # List id to delete.
+
+    # """
+    # response = requests.delete(
+    # url=self.get_api(API_LISTS_DELETE).format(id), headers=self._access_token_()
+    # )
+    # response.raise_for_status()
+    # return response.json()
 
     def _access_token_(self):
         if self.token is None:
             raise RuntimeError("Authosization required for requested operation!")
-        return {"Authorization": f'Bearer {self.token["access"]}'}
+        return {"Authorization": f"Bearer {self.token.access}"}
+
+    @staticmethod
+    def _raise_or_return_(response):
+        response.raise_for_status()
+        return response.json()
