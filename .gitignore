@@ -65,6 +65,5 @@ target/
 *.jsl
 *.db
 tmp*
-test_*
 .env*
 venv*
