@@ -20,7 +20,7 @@ class ToDoList(object):
 
     # ToDo
     def remove(self, index):
-        self.items.remove(self.items[0])
+        self.items.remove(self.items[index])
         self.sync()
 
     # ToDo
