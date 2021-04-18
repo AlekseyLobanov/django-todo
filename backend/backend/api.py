@@ -5,8 +5,14 @@ from django_filters.rest_framework import DjangoFilterBackend
 from .models import ToDoList, ToDoItem
 
 
+class ToDoListField(serializers.PrimaryKeyRelatedField):
+    def get_queryset(self):
+        user = self.context["request"].user
+        return ToDoList.objects.filter(user=user)
+
+
 class ToDoItemSerializer(serializers.HyperlinkedModelSerializer):
-    parent = serializers.PrimaryKeyRelatedField(many=False, read_only=True)
+    parent = ToDoListField(many=False, read_only=False, help_text="ID родительского списка")
 
     class Meta:
         model = ToDoItem
@@ -31,6 +37,12 @@ class ToDoListSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = ToDoList
         fields = ["id", "title", "created_at"]
+
+    def create(self, validated_data):
+        todo_list = ToDoList.objects.create(
+            user=self.context["request"].user, title=validated_data["title"]
+        )
+        return todo_list
 
 
 class ToDoListViewSet(viewsets.ModelViewSet):
