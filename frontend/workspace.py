@@ -5,26 +5,55 @@ def str_time(time):
     return time.strftime("%Y-%m-%d %H:%M:%S")
 
 
+TODO_ITEM_TABLE_TEXT_WIDTH = 15
+TODO_ITEM_TABLE_FINISHED_WIDTH = 8
+TODO_ITEM_TABLE_CREATED_AT_WIDTH = 15
+
+
+def placeholder():
+    print("Не реализовано")
+
+
 class ToDoItemWidget(tk.Frame):
-    def __init__(self, *args, item, parent=None, **argv):
+    @staticmethod
+    def header(parent):
+        body = tk.Frame(parent)
+
+        text = tk.Label(body, text="Текст", width=TODO_ITEM_TABLE_TEXT_WIDTH)
+        text.pack(side="left")
+
+        text = tk.Label(body, text="Выполнено", width=TODO_ITEM_TABLE_FINISHED_WIDTH)
+        text.pack(side="left")
+
+        text = tk.Label(body, text="Создано", width=TODO_ITEM_TABLE_CREATED_AT_WIDTH)
+        text.pack(side="left")
+
+        return body
+
+    def __init__(self, *args, item, **argv):
         super().__init__(*args, **argv)
 
-        self.parent = parent
+        self.parent = self.master
         self.item = item
 
-        self.noteLabel = tk.Label(self, text=item.text, width=15)
+        self.noteLabel = tk.Label(self, text=item.text, width=TODO_ITEM_TABLE_TEXT_WIDTH)
         self.noteLabel.pack(side="left")
 
         self.finished = tk.IntVar(value=int(item.finished))
         self.finishedButton = tk.Checkbutton(
-            self, variable=self.finished, command=self.finishedButton_command
+            self,
+            variable=self.finished,
+            command=self.finishedButton_command,
+            width=TODO_ITEM_TABLE_FINISHED_WIDTH,
         )
         self.finishedButton.pack(side="left")
 
-        self.createdAt = tk.Label(self, text=str_time(item.created_at), width=15)
+        self.createdAt = tk.Label(
+            self, text=str_time(item.created_at), width=TODO_ITEM_TABLE_CREATED_AT_WIDTH
+        )
         self.createdAt.pack(side="left")
 
-        self.remove = tk.Button(self, text="Удалить", command=lambda: parent.remove(self.item))
+        self.remove = tk.Button(self, text="Удалить", command=lambda: self.parent.remove(self.item))
         self.remove.pack(side="left")
 
     def finishedButton_command(self):
@@ -37,20 +66,24 @@ class ToDoListWidget(tk.Frame):
 
     def fill(self, itemList):
 
-        self.header = tk.Label(self, text="Текст | Выполнено | Время создания")
-        self.header.pack(side="top", fill="y")
+        header = ToDoItemWidget.header(self)
+        header.pack(side="left")
+        header.pack(side="top", fill="y")
 
         self.itemList = itemList
 
         for item in itemList:
-            item = ToDoItemWidget(self, item=item, parent=self)
+            item = ToDoItemWidget(self, item=item)
             item.pack(side="top", fill="y")
 
         self.itemToAdd = tk.Text(self, width=15, height=1)
         self.itemToAdd.pack(side="top")
 
-        add = tk.Button(self, text="Добавить", command=self.add_command)
+        add = tk.Button(self, text="Добавить заметку", command=self.add_command)
         add.pack(side="top")
+
+        delete = tk.Button(self, text="Удалить лист", command=placeholder)
+        delete.pack(side="top")
 
     def update(self, itemList=None):
         self.clear()
@@ -89,6 +122,12 @@ class WorkSpaceFrame(tk.Frame):
 
         # data
         self.lists = user.fetchUserLists()
+
+        text = tk.Text(self, width=15, height=1)
+        text.pack(anchor="sw")
+
+        add = tk.Button(self, text="Добавить лист", command=placeholder)
+        add.pack(anchor="sw")
 
         # select list box
         self.listBox = tk.Listbox(self, width=30, selectmode=tk.SINGLE)
