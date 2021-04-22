@@ -1,3 +1,5 @@
+import os
+
 from datetime import datetime
 from api import UserApi
 
@@ -9,6 +11,10 @@ class ToDoList(object):
         self.items = items
         self.created_at = created_at
 
+    def __iter__(self):
+        for item in self.items:
+            yield item
+
     def __getitem__(self, index):
         return self.items[index]
 
@@ -17,6 +23,9 @@ class ToDoList(object):
 
     def __str__(self):
         return f"[{self.id}] {self.title}"
+
+    def index(self, value):
+        return self.items.index(value)
 
     # ToDo
     def remove(self, index):
@@ -64,6 +73,10 @@ class ToDoItem(object):
 
 
 class User(UserApi):
+    def auth(self, user, passwd):
+        if "DEBUG" in os.environ:
+            return
+        UserApi.auth(self, user, passwd)
 
     # ToDo
     items = [
