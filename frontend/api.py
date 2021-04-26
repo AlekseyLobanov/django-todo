@@ -13,10 +13,10 @@ API_TODO_ITEMS_DELETE = "api/todo_items/{0}/"
 
 API_LISTS_LIST = "api/lists/"
 API_LISTS_CREATE = "api/lists/"
-API_LISTS_READ = "lists/{0}/"
-API_LISTS_UPDATE = "lists/{0}/"
-API_LISTS_PARTIAL_UPDATE = "lists/{0}/"
-API_LISTS_DELETE = "lists/{0}/"
+API_LISTS_READ = "api/lists/{0}/"
+API_LISTS_UPDATE = "api/lists/{0}/"
+API_LISTS_PARTIAL_UPDATE = "api/lists/{0}/"
+API_LISTS_DELETE = "api/lists/{0}/"
 
 API_TOKEN = "api/token/"
 
@@ -101,7 +101,44 @@ class UserApi(object):
                 headers=self._access_token_(),
             )
         )
+    
+    def lists_delete(self, id):
+        """
+        Auth required
+        
+        Deletes a to-do list by id
+        
+        Parameters
+        ----------
+        id: to-do list id to delete
+        """
+        return UserApi._raise_or_return_(
+            requests.delete(
+                url=self.get_api(API_LISTS_DELETE.format(id)),
+                headers=self._access_token_(),
+            )
+        )
+    
+    def lists_update(self, title, id):
+        """
+        Rename a new to-do list
+        Auth required
 
+        Parameters
+        ----------
+        title : str 
+            New name for a list.
+        id : int
+
+        """
+        return UserApi._raise_or_return_(
+            requests.put(
+                url=self.get_api(API_LISTS_UPDATE.format(id)),
+                json={"title": title},
+                headers=self._access_token_(),
+            )
+        )
+    
     def todo_items_list(self, **argv):
         """
         List all the exsiting to-do items.
@@ -118,7 +155,68 @@ class UserApi(object):
                 url=self.get_api(API_TODO_ITEMS_LIST), headers=self._access_token_(), params=argv
             )
         )
+    
+    def todo_items_create(self, parent, text="Note"):
+        """
+        Create a new to-do item
+        Auth required
 
+        Parameters
+        ----------
+        parent : id of parent list
+        text : str, optional
+            New note. The default is "Note".
+
+        """
+        return UserApi._raise_or_return_(
+            requests.post(
+                url=self.get_api(API_TODO_ITEMS_CREATE),
+                json={"text": text, "parent":parent, "finished":False},
+                headers=self._access_token_(),
+            )
+        )
+    
+    def todo_items_delete(self, id):
+        """
+        Auth required
+        
+        Deletes a to-do item by id
+        
+        Parameters
+        ----------
+        id: to-do item id to delete
+        """
+        return UserApi._raise_or_return_(
+            requests.delete(
+                url=self.get_api(API_TODO_ITEMS_DELETE.format(id)),
+                headers=self._access_token_(),
+            )
+        )
+    
+    def todo_items_update(self, id, text, finished, parent):
+        """
+        Rename a new to-do list
+        Auth required
+
+        Parameters
+        ----------
+        id : int
+            Note id
+        text : str 
+            New note for the item.
+        finished : bool
+            New state for the item
+        parent : int
+            Parent list id
+        """
+        return UserApi._raise_or_return_(
+            requests.put(
+                url=self.get_api(API_TODO_ITEMS_UPDATE.format(id)),
+                json={"text": text, "finished":finished, "parent":parent},
+                headers=self._access_token_(),
+            )
+        )
+    
     # def create(self, title="Untitled"):
     # """
     # Create a new to-do list
@@ -215,4 +313,7 @@ class UserApi(object):
     @staticmethod
     def _raise_or_return_(response):
         response.raise_for_status()
-        return response.json()
+        try:
+            return response.json()
+        except:
+            return response.content
