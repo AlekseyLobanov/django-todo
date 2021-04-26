@@ -4,7 +4,9 @@ from user import User
 
 def print_lists(lists):
     for item in lists:
-        print(f"List: '{item.title}'", f"Id: {item.id}", "|", "|".join([str(x) for x in item.items_]))
+        print(
+            f"List: '{item.title}'", f"Id: {item.id}", "|", "|".join([str(x) for x in item.items_])
+        )
 
 
 DEFAULT_URL = "http://127.0.0.1:8000"

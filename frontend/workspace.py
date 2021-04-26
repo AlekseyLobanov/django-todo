@@ -152,7 +152,7 @@ class WorkSpaceFrame(tk.Frame):
         # todo lists
         self.toToList = ToDoListWidget(self)
         self.toToList.pack(side="left", fill="both", expand=1)
-    
+
     def add_list(self, *args):
         text = self.add_list_text.get(1.0, "end").strip()
         if len(text) == 0:
@@ -160,18 +160,17 @@ class WorkSpaceFrame(tk.Frame):
             return
         self.user.appendUserList(title=text)
         self.lists = self.user.fetchUserLists()
-        
+
         # fill list box
-        self.listBox.delete(0,'end')
+        self.listBox.delete(0, "end")
         for item in self.lists:
             s = f"{str(item)}: {item.created_at.strftime('%Y-%m-%d %H:%M:%S')}"
             self.listBox.insert(tk.END, s)
         self.listBox.pack()
         len(self.lists) > 0 and self.listBox.selection_set(first=0)
-        
 
     def listBox_selected(self, *args):
-        
+
         self.toToList.clear()
 
         selection = self.listBox.curselection()

@@ -1,7 +1,5 @@
 import os
 
-from types import SimpleNamespace
-
 from datetime import datetime
 
 import numpy as np
@@ -14,12 +12,13 @@ UPDATE_ERROR = "Failed to update property: {0}"
 
 DATETIME_STR = "%Y-%m-%dT%H:%M:%S.%fZ"
 
+
 def bad_arguments(x, d):
     return list((set(x) - set(d)))
 
+
 class ToDoList(object):
-    def __init__(self, id, title, created_at=None, items=None, 
-        parent=None, user=None):
+    def __init__(self, id, title, created_at=None, items=None, parent=None, user=None):
         self.id = id
         self.title = title
         self.items_ = [] if items is None else items
@@ -44,7 +43,7 @@ class ToDoList(object):
 
     def index(self, value):
         return self.items_.index(value)
-        
+
     def remove(self, index):
         """
         Remove item at index from db
@@ -52,7 +51,7 @@ class ToDoList(object):
         item = self.items_[index]
         self.items_.remove(item)
         item.dispose()
-        
+
     def append(self, text):
         """
         Add a new item to db
@@ -72,26 +71,24 @@ class ToDoList(object):
         for key, value in argv.items():
             setattr(self, key, value)
         self.sync()
-    
+
     def dispose(self):
         print(f"To-do list id '{self.id}' is being disposed of...")
         if "DEBUG" in os.environ:
             return
         for item in self.items_:
             item.dispose()
-        self.user.lists_delete(self.id)            
-    
+        self.user.lists_delete(self.id)
+
     def sync(self):
         print(f"Item '{self}' is being synchronized...")
         if "DEBUG" in os.environ:
             return
         self.user.lists_update(title=self.title, id=self.id)
-        
 
 
 class ToDoItem(object):
-    def __init__(self, id, text, finished=False, created_at=None, 
-        parent=None, user=None):
+    def __init__(self, id, text, finished=False, created_at=None, parent=None, user=None):
         self.id = id
         self.text = text
         self.finished = finished
@@ -113,19 +110,21 @@ class ToDoItem(object):
         for key, value in argv.items():
             setattr(self, key, value)
         self.sync()
-    
+
     def dispose(self):
         print(f"To-do item id '{self.id}' is being disposed of...")
         if "DEBUG" in os.environ:
             return
         self.user.todo_items_delete(self.id)
-    
+
     # ToDo
     def sync(self):
         print(f"Item '{self}' is being synchronized...")
         if "DEBUG" in os.environ:
             return
-        self.user.todo_items_update(id=self.id, text=self.text, finished=self.finished, parent=self.parent)
+        self.user.todo_items_update(
+            id=self.id, text=self.text, finished=self.finished, parent=self.parent
+        )
 
 
 def make_debug_lists():
@@ -142,8 +141,8 @@ def make_debug_lists():
         for i in range(10)
     ]
 
+
 class User(UserApi):
-    
     def auth(self, user, passwd):
         """
         Basic authentification
@@ -151,10 +150,10 @@ class User(UserApi):
         if "DEBUG" in os.environ:
             return
         UserApi.auth(self, user, passwd)
-    
+
     # Storing lists - mostly for debug purposes
     lists_ = make_debug_lists()
-    
+
     def fetchUserLists(self):
         """
         Fetch existing user lists from the server
@@ -165,7 +164,7 @@ class User(UserApi):
             return self.lists_
         user_lists = self.lists_list()["results"]
         user_items = self.todo_items_list()["results"]
-        toDoLists = {x["id"]:ToDoList(**x, user=self) for x in user_lists}
+        toDoLists = {x["id"]: ToDoList(**x, user=self) for x in user_lists}
         toDoItems = [ToDoItem(**x, user=self) for x in user_items]
         for toDoItem in toDoItems:
             # Catching stray items
@@ -180,15 +179,14 @@ class User(UserApi):
 
     def removeUserList(self, id):
         """
-        Remove existing user to-do list from the serverreturns: 
+        Remove existing user to-do list from the serverreturns:
         """
         to_remove = [item for item in self.lists_ if item.id == id][0]
         self.lists_.remove(to_remove)
         if not ("DEBUG" in os.environ):
             to_remove.dispose()
         return self.lists_
-        
-        
+
     def appendUserList(self, title):
         """
         Create a new user list
