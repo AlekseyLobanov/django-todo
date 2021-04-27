@@ -56,5 +56,5 @@ docker-compose exec web python manage.py makemigrations backend
 
 Для запуска тестов использовать
 ```bash
-docker-compose exec web python manage.py test
+docker-compose run web pytest --cov=backend
 ```
