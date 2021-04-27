@@ -1,83 +1,75 @@
-import os
-
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "backend.settings")
-
-from django.core.wsgi import get_wsgi_application
-application = get_wsgi_application()
-
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
-from rest_framework.test import APIClient
 from django.contrib.auth.models import User
-from backend.api import router
 from .test_todo import create_todo
 
+
 class ItemTest(APITestCase):
-    '''Tests API for items.'''
+    """Tests API for items."""
 
     def prepare(self):
-        user = User.objects.create_user('test_user4', 'test@test.com', 'test_password')
+        user = User.objects.create_user("test_user4", "test@test.com", "test_password")
         self.client.force_authenticate(user=user)
-        to_do_id_1 = create_todo(self.client, "ToDoList1").data['id']
-        to_do_id_2 = create_todo(self.client, "ToDoList2").data['id']
+        to_do_id_1 = create_todo(self.client, "ToDoList1").data["id"]
+        to_do_id_2 = create_todo(self.client, "ToDoList2").data["id"]
         return to_do_id_1, to_do_id_2
 
     def get(self, expected_titles, todo_id=None, finished=None):
-        url = reverse('ToDoItems-list')
+        url = reverse("ToDoItems-list")
         data = {}
         if finished is not None:
             data["finished"] = finished
         if todo_id is not None:
             data["parent"] = todo_id
 
-        response = self.client.get(url, data, format='json')
+        response = self.client.get(url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        real_titles = [(d['text'], d['parent']) for d in response.data['results']]
+        real_titles = [(d["text"], d["parent"]) for d in response.data["results"]]
         self.assertEqual(real_titles, expected_titles)
 
         if finished is not None:
-            item_status = [data['finished'] for data in response.data['results']]
+            item_status = [data["finished"] for data in response.data["results"]]
             self.assertEqual(finished, all(item_status))
 
     def post(self, item_text, todo_id, finished=None):
-        url = reverse('ToDoItems-list')
+        url = reverse("ToDoItems-list")
         if finished is not None:
             data = {"text": item_text, "parent": todo_id, "finished": finished}
         else:
             data = {"text": item_text, "parent": todo_id}
-        response = self.client.post(url, data, format='json')
+        response = self.client.post(url, data, format="json")
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         check_finished = False if (finished is None) else finished
-        self.assertEqual(response.data['text'], item_text)
-        self.assertEqual(response.data['parent'], todo_id)
-        self.assertEqual(response.data['finished'], check_finished)
+        self.assertEqual(response.data["text"], item_text)
+        self.assertEqual(response.data["parent"], todo_id)
+        self.assertEqual(response.data["finished"], check_finished)
 
-        return response.data['id'], response.data['finished']
+        return response.data["id"], response.data["finished"]
 
     def get_by_id(self, id, text, finished, parent):
-        url_with_id = reverse('ToDoItems-detail', args=(id,))
-        response = self.client.get(url_with_id, {id: id}, format='json')
+        url_with_id = reverse("ToDoItems-detail", args=(id,))
+        response = self.client.get(url_with_id, {id: id}, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['text'], text)
-        self.assertEqual(response.data['finished'], finished)
-        self.assertEqual(response.data['parent'], parent)
-    
+        self.assertEqual(response.data["text"], text)
+        self.assertEqual(response.data["finished"], finished)
+        self.assertEqual(response.data["parent"], parent)
+
     def put(self, id, text, parent, finished=None):
-        url_with_id = reverse('ToDoItems-detail', args=(id,))
+        url_with_id = reverse("ToDoItems-detail", args=(id,))
         data = {"text": text, "parent": parent}
         if finished is not None:
             data["finished"] = finished
-        response = self.client.put(url_with_id, data, format='json')
+        response = self.client.put(url_with_id, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['text'], text)
-        self.assertEqual(response.data['parent'], parent)
+        self.assertEqual(response.data["text"], text)
+        self.assertEqual(response.data["parent"], parent)
         if finished is not None:
-            self.assertEqual(response.data['finished'], finished)
+            self.assertEqual(response.data["finished"], finished)
 
     def patch(self, id, text=None, finished=None, parent=None):
-        url_with_id = reverse('ToDoItems-detail', args=(id,))
+        url_with_id = reverse("ToDoItems-detail", args=(id,))
         data = {}
         if text is not None:
             data["text"] = text
@@ -85,21 +77,21 @@ class ItemTest(APITestCase):
             data["finished"] = finished
         if parent is not None:
             data["parent"] = parent
-        response = self.client.patch(url_with_id, data, format='json')
+        response = self.client.patch(url_with_id, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         if text is not None:
-            self.assertEqual(response.data['text'], text)
+            self.assertEqual(response.data["text"], text)
         if finished is not None:
-            self.assertEqual(response.data['finished'], finished)
+            self.assertEqual(response.data["finished"], finished)
         if parent is not None:
-            self.assertEqual(response.data['parent'], parent)
-            
+            self.assertEqual(response.data["parent"], parent)
+
     def delete(self, id, title, finished, to_do_id):
         self.get_by_id(id, title, finished, to_do_id)
-        url_with_id = reverse('ToDoItems-detail', args=(id,))
-        response = self.client.delete(url_with_id, {}, format='json')
+        url_with_id = reverse("ToDoItems-detail", args=(id,))
+        response = self.client.delete(url_with_id, {}, format="json")
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
-    
+
     def test_create_delete(self):
         """
         /todo_items/: get, post (create)
@@ -113,13 +105,24 @@ class ItemTest(APITestCase):
         item_id_2, item_finished_2 = self.post(item_text_2, to_do_id_1, finished=False)
         self.get([(item_text_1, to_do_id_1), (item_text_2, to_do_id_1)], to_do_id_1)
         item_id_3, item_finished_3 = self.post(item_text_3, to_do_id_1, finished=True)
-        self.get([(item_text_1, to_do_id_1), (item_text_2, to_do_id_1), \
-            (item_text_3, to_do_id_1)], to_do_id_1)
-        item_id_4, item_finished_4 = self.post(item_text_4, to_do_id_2, finished=False) 
-        self.get([(item_text_1, to_do_id_1), (item_text_2, to_do_id_1), \
-            (item_text_3, to_do_id_1), (item_text_4, to_do_id_2)])
+        self.get(
+            [(item_text_1, to_do_id_1), (item_text_2, to_do_id_1), (item_text_3, to_do_id_1)],
+            to_do_id_1,
+        )
+        item_id_4, item_finished_4 = self.post(item_text_4, to_do_id_2, finished=False)
+        self.get(
+            [
+                (item_text_1, to_do_id_1),
+                (item_text_2, to_do_id_1),
+                (item_text_3, to_do_id_1),
+                (item_text_4, to_do_id_2),
+            ]
+        )
 
-        self.get([(item_text_1, to_do_id_1), (item_text_2, to_do_id_1), (item_text_3, to_do_id_1)], to_do_id_1)
+        self.get(
+            [(item_text_1, to_do_id_1), (item_text_2, to_do_id_1), (item_text_3, to_do_id_1)],
+            to_do_id_1,
+        )
         self.get([(item_text_1, to_do_id_1), (item_text_2, to_do_id_1)], to_do_id_1, finished=False)
         self.get([(item_text_3, to_do_id_1)], to_do_id_1, finished=True)
 
@@ -149,9 +152,3 @@ class ItemTest(APITestCase):
         self.patch(item_id_1, parent=to_do_id_1)
         self.patch(item_id_1, finished=True)
         self.patch(item_id_1, text=item_text_1_3)
-
-
-
-
-
-

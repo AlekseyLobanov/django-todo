@@ -56,5 +56,5 @@ docker-compose exec web python manage.py makemigrations backend
 
 Для запуска тестов использовать
 ```bash
-docker-compose run web pytest --cov=backend
+docker-compose run -e DJANGO_SETTINGS_MODULE=backend.settings web pytest --cov=backend
 ```
