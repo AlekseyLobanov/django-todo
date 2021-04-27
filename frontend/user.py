@@ -1,8 +1,11 @@
 import os
 import random
-
 from datetime import datetime
+from types import SimpleNamespace
 
+from pathlib import Path
+
+import json
 
 from api import UserApi
 
@@ -11,6 +14,8 @@ TODO_ITEM_UPDATEBLE = ["text", "finished"]
 UPDATE_ERROR = "Failed to update property: {0}"
 
 DATETIME_STR = "%Y-%m-%dT%H:%M:%S.%fZ"
+
+USER_TOKEN_PATH = os.path.join(Path.home(), ".todo_config.json")
 
 
 def bad_arguments(x, d):
@@ -150,7 +155,43 @@ class User(UserApi):
         """
         if "DEBUG" in os.environ:
             return
-        UserApi.auth(self, user, passwd)
+        return UserApi.auth(self, user, passwd)
+
+    def remove(self):
+        """
+        Remove the login file from homedir
+        """
+        if not os.path.exists(USER_TOKEN_PATH):
+            return
+        try:
+            os.remove(USER_TOKEN_PATH)
+        except Exception as e:
+            raise RuntimeError("Failed to remove tokens:", e)
+
+    def save(self):
+        """
+        Store user token in homedir
+        """
+        try:
+            with open(USER_TOKEN_PATH, "w") as handler:
+                json.dump(self.token.__dict__, handler)
+        except Exception as e:
+            raise RuntimeError("Failed to store tokens:", e)
+
+    @staticmethod
+    def load():
+        """
+        Restore user token from the file in homedir
+        """
+        if os.path.exists(USER_TOKEN_PATH):
+            try:
+                with open(USER_TOKEN_PATH, "r") as handler:
+                    user = User(token=SimpleNamespace(**json.load(handler)))
+                    user.refresh()
+                    return user
+            except Exception as e:
+                raise RuntimeError("Failed to restore tokens:", e)
+        return None
 
     # Storing lists - mostly for debug purposes
     lists_ = make_debug_lists()

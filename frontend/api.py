@@ -18,7 +18,8 @@ API_LISTS_UPDATE = "api/lists/{0}/"
 API_LISTS_PARTIAL_UPDATE = "api/lists/{0}/"
 API_LISTS_DELETE = "api/lists/{0}/"
 
-API_TOKEN = "api/token/"
+API_TOKEN_CREATE = "api/token/"
+API_TOKEN_REFRESH = "api/token/refresh/"
 
 
 class UserApi(object):
@@ -61,9 +62,21 @@ class UserApi(object):
 
         """
         token = UserApi._raise_or_return_(
-            requests.post(url=self.get_api(API_TOKEN), json={"username": user, "password": passwd})
+            requests.post(
+                url=self.get_api(API_TOKEN_CREATE), json={"username": user, "password": passwd}
+            )
         )
         self.token = SimpleNamespace(**token)
+        return self.token
+
+    def refresh(self):
+        """
+        Refresh existing token
+        """
+        token = UserApi._raise_or_return_(
+            requests.post(url=self.get_api(API_TOKEN_REFRESH), json={"refresh": self.token.refresh})
+        )
+        self.token.access = token["access"]
         return self.token
 
     def lists_list(self, **argv):

@@ -118,7 +118,19 @@ class WorkSpaceFrame(tk.Frame):
         self.pack(fill=tk.BOTH, expand=1)
         self.initLayout(user)
 
+    def destroy(self):
+        tk.Tk.destroy(self)
+        if self.rbtn_var.get() > 0:
+            self.user.save()
+        else:
+            self.user.remove()
+
     def initLayout(self, user):
+
+        # Запомнить пользователя
+        self.rbtn_var = tk.IntVar(value=1)
+        rbtn = tk.Checkbutton(self, text="Запомнить меня", variable=self.rbtn_var, command=None)
+        rbtn.pack(anchor="n")
 
         # data
         self.lists = user.fetchUserLists()

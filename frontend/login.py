@@ -38,6 +38,13 @@ class LoginFrame(tk.Frame):
             print(ex)
             message.invalid_login()
 
+    # Если захочется реализовать в логине
+    """
+    @property
+    def remember(self):
+        return self.rbtn_var.get()
+    """
+
     def initAUTH(self) -> None:
         """
         Создает окно авторизации программы
@@ -66,3 +73,16 @@ class LoginFrame(tk.Frame):
         # Кнопка авториазции
         btn = tk.Button(self, text="Войти", command=self.login_clicked)
         btn.grid(row=14, column=12, columnspan=3, rowspan=1, sticky="nsew")
+
+        # Если захочется реализовать в логине
+        """
+        # Запомнить пользователя
+        self.rbtn_var = tk.IntVar(value=0)
+        rbtn = tk.Checkbutton(
+            self,
+            text="Запомнить меня",
+            variable=self.rbtn_var,
+            command=None
+        )
+        rbtn.grid(row=15, column=12, columnspan=3, rowspan=1, sticky="nsew")
+        """

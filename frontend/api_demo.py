@@ -13,6 +13,7 @@ DEFAULT_URL = "http://127.0.0.1:8000"
 
 user = User(url=DEFAULT_URL)
 user.auth("root", "root")
+user.refresh()
 
 # Fetch existing lists:
 print_lists(user.fetchUserLists())

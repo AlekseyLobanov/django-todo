@@ -4,6 +4,7 @@ import sys
 import tkinter as tk
 from login import LoginFrame
 from workspace import WorkSpaceFrame
+from user import User
 
 if "win" in sys.platform.lower():
     DEFAULT_URL = "http://localhost:8000"
@@ -24,11 +25,19 @@ class Application(tk.Tk):
 
     def login(self):
         """Возвращает пользователя - его можно потом сериализовать"""
+        # Пользователь сохранен! Авторизация не нужна!
+        user = User.load()
+        if user is not None:
+            return user
+        # Не удалось - нужен логин
         self.frame = LoginFrame(master=self, url=DEFAULT_URL)
         while not self.frame.loggedIn:
             self.update_idletasks()
             self.update()
         self.frame.destroy()
+        # Нужно запомнить пользователя
+        # if self.frame.remember:
+        #    self.frame.user.save()
         return self.frame.user
 
     def main(self, user):
