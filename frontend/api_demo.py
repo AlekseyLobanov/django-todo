@@ -1,4 +1,4 @@
-import numpy as np
+import random
 from user import User
 
 
@@ -22,15 +22,9 @@ print("Appending list...")
 scroll = user.appendUserList(title="a new list!")
 print_lists(user.fetchUserLists())
 
-# Remove user list by id:
-i = user.lists_[0].id
-print(f"Removing {i}...")
-user.removeUserList(i)
-print_lists(user.fetchUserLists())
-
 # Modify list 0:
 print("Modifyng list...")
-user.lists_[0].modify(title=f"A new title {np.random.random()}")
+user.lists_[0].modify(title=f"A new title №{random.random()}")
 print_lists(user.fetchUserLists())
 
 # Append item to list:
@@ -43,7 +37,13 @@ print("Modifyng appended item...")
 item.modify(finished=True, text="this is an updated item")
 print_lists(user.fetchUserLists())
 
-# Removing item at 0
-print("Removing last item from last list...")
+# Removing item at from last list
+print("Removing the last item from the last list...")
 user.lists_[-1].remove(-1)
+print_lists(user.fetchUserLists())
+
+# Remove user list by id:
+i = user.lists_[0].id
+print(f"Removing {i}...")
+user.removeUserList(i)
 print_lists(user.fetchUserLists())

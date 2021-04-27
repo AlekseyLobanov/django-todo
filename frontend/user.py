@@ -1,8 +1,8 @@
 import os
+import random
 
 from datetime import datetime
 
-import numpy as np
 
 from api import UserApi
 
@@ -17,15 +17,21 @@ def bad_arguments(x, d):
     return list((set(x) - set(d)))
 
 
+def date_or_str(inpt):
+    if type(inpt) is datetime:
+        return inpt
+    elif type(inpt) is str:
+        return datetime.strptime(inpt, DATETIME_STR)
+    else:
+        return datetime.now()
+
+
 class ToDoList(object):
     def __init__(self, id, title, created_at=None, items=None, parent=None, user=None):
         self.id = id
         self.title = title
         self.items_ = [] if items is None else items
-        if type(created_at) is datetime:
-            self.created_at = created_at
-        else:
-            self.created_at = datetime.strptime(created_at, DATETIME_STR)
+        self.created_at = date_or_str(created_at)
         self.user = user
 
     def __iter__(self):
@@ -57,7 +63,7 @@ class ToDoList(object):
         Add a new item to db
         """
         if "DEBUG" in os.environ:
-            created_item = ToDoItem(id=np.random.randint(100, 1000), text=text, user=self.user)
+            created_item = ToDoItem(id=random.randint(100, 1000), text=text, user=self.user)
         else:
             created_item = self.user.todo_items_create(parent=self.id, text=text)
             created_item = ToDoItem(**created_item, user=self.user)
@@ -92,10 +98,7 @@ class ToDoItem(object):
         self.id = id
         self.text = text
         self.finished = finished
-        if type(created_at) is datetime:
-            self.created_at = created_at
-        else:
-            self.created_at = datetime.strptime(created_at, DATETIME_STR)
+        self.created_at = date_or_str(created_at)
         self.parent = parent
         self.user = user
 
@@ -105,7 +108,6 @@ class ToDoItem(object):
     def modify(self, **argv):
         bad = bad_arguments(argv.keys(), TODO_ITEM_UPDATEBLE)
         if len(bad) > 0:
-            print(argv)
             raise RuntimeError(UPDATE_ERROR.format(bad[0]))
         for key, value in argv.items():
             setattr(self, key, value)
@@ -117,7 +119,6 @@ class ToDoItem(object):
             return
         self.user.todo_items_delete(self.id)
 
-    # ToDo
     def sync(self):
         print(f"Item '{self}' is being synchronized...")
         if "DEBUG" in os.environ:
@@ -164,17 +165,17 @@ class User(UserApi):
             return self.lists_
         user_lists = self.lists_list()["results"]
         user_items = self.todo_items_list()["results"]
-        toDoLists = {x["id"]: ToDoList(**x, user=self) for x in user_lists}
-        toDoItems = [ToDoItem(**x, user=self) for x in user_items]
-        for toDoItem in toDoItems:
+        todo_lists = {x["id"]: ToDoList(**x, user=self) for x in user_lists}
+        todo_items = [ToDoItem(**x, user=self) for x in user_items]
+        for todo_item in todo_items:
             # Catching stray items
-            if not hasattr(toDoItem, "parent"):
-                toDoItem.dispose()
-                continue
-            toDoLists[toDoItem.parent].items_.append(toDoItem)
-        for toDoList in toDoLists.values():
-            toDoList.items_ = sorted(toDoList.items_, key=lambda x: x.created_at)
-        self.lists_ = sorted(toDoLists.values(), key=lambda x: x.created_at)
+            # if not hasattr(toDoItem, "parent"):
+            #    toDoItem.dispose()
+            #    continue
+            todo_lists[todo_item.parent].items_.append(todo_item)
+        for todo_list in todo_lists.values():
+            todo_list.items_ = sorted(todo_list.items_, key=lambda x: x.created_at)
+        self.lists_ = sorted(todo_lists.values(), key=lambda x: x.created_at)
         return self.lists_
 
     def removeUserList(self, id):
@@ -194,7 +195,7 @@ class User(UserApi):
         returns: created item
         """
         if "DEBUG" in os.environ:
-            item = ToDoList(id=np.random.randint(100, 1000), title=title, created_at=datetime.now())
+            item = ToDoList(id=random.randint(100, 1000), title=title, created_at=datetime.now())
             self.lists_.append(item)
             return item
         created_list = self.lists_create(title=title)
