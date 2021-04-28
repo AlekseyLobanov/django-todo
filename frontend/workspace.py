@@ -5,9 +5,9 @@ def str_time(time):
     return time.strftime("%Y-%m-%d %H:%M:%S")
 
 
-TODO_ITEM_TABLE_TEXT_WIDTH = 15
-TODO_ITEM_TABLE_FINISHED_WIDTH = 8
-TODO_ITEM_TABLE_CREATED_AT_WIDTH = 15
+TODO_ITEM_TABLE_TEXT_WIDTH = 24
+TODO_ITEM_TABLE_FINISHED_WIDTH = 12
+TODO_ITEM_TABLE_CREATED_AT_WIDTH = 24
 
 
 def placeholder():
@@ -147,14 +147,14 @@ class WorkSpaceFrame(tk.Frame):
         # data
         self.lists = user.fetchUserLists()
 
-        self.add_list_text = tk.Text(self, width=15, height=1)
+        self.add_list_text = tk.Text(self, width=25, height=1)
         self.add_list_text.pack(anchor="sw")
 
         add = tk.Button(self, text="Добавить лист", command=self.add_list)
         add.pack(anchor="sw")
 
         # select list box
-        self.listBox = tk.Listbox(self, width=30, selectmode=tk.SINGLE)
+        self.listBox = tk.Listbox(self, width=40, selectmode=tk.SINGLE)
         self.listBox.pack(side="left", fill="y")
         self.listBox.bind("<<ListboxSelect>>", self.listBox_selected)
 

@@ -11,8 +11,8 @@ if "win" in sys.platform.lower():
 else:
     DEFAULT_URL = "http://0.0.0.0:8000"
 
-BASE_W = 600
-BASE_H = 400
+BASE_W = 1600
+BASE_H = 600
 
 TITLE_APP = "ToDo Application"
 
