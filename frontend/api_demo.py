@@ -1,48 +1,50 @@
+import random
 from user import User
 
 
 def print_lists(lists):
     for item in lists:
-        print(f"List: '{item}'", f"Id: {item.id}", "|", "|".join([str(x) for x in item.items]))
+        print(
+            f"List: '{item.title}'", f"Id: {item.id}", "|", "|".join([str(x) for x in item.items_])
+        )
 
 
 DEFAULT_URL = "http://127.0.0.1:8000"
 
 user = User(url=DEFAULT_URL)
 user.auth("root", "root")
+user.refresh()
 
 # Fetch existing lists:
-lists = user.fetchUserLists()
-print("Fecthing...")
-print_lists(lists)
-
-# Remove user list by id:
-user.removeUserList(5)
-lists = user.fetchUserLists()
-print(f"Removing {5}...")
-print_lists(lists)
+print_lists(user.fetchUserLists())
 
 # Append a new list to user:
 print("Appending list...")
 scroll = user.appendUserList(title="a new list!")
-print_lists(lists)
+print_lists(user.fetchUserLists())
 
 # Modify list 0:
 print("Modifyng list...")
-lists[0].modify(title="A new title")
-print_lists(lists)
+user.lists_[0].modify(title=f"A new title №{random.random()}")
+print_lists(user.fetchUserLists())
 
 # Append item to list:
 print("Appending item to last list...")
-item = lists[-1].append(text="this is an item")
-print_lists(lists)
+item = user.lists_[-1].append(text="this is an item")
+print_lists(user.fetchUserLists())
 
 # Modifying item
 print("Modifyng appended item...")
 item.modify(finished=True, text="this is an updated item")
-print_lists(lists)
+print_lists(user.fetchUserLists())
 
-# Removing item at 0
-print("Removing item 0 from list 0...")
-lists[0].remove(0)
-print_lists(lists)
+# Removing item at from last list
+print("Removing the last item from the last list...")
+user.lists_[-1].remove(-1)
+print_lists(user.fetchUserLists())
+
+# Remove user list by id:
+i = user.lists_[0].id
+print(f"Removing {i}...")
+user.removeUserList(i)
+print_lists(user.fetchUserLists())
