@@ -161,6 +161,9 @@ class User(UserApi):
         """
         Remove the login file from homedir
         """
+        if "DEBUG" in os.environ:
+            print("Debug mode is on - no login storing")
+            return
         if not os.path.exists(USER_TOKEN_PATH):
             return
         try:
@@ -172,6 +175,9 @@ class User(UserApi):
         """
         Store user token in homedir
         """
+        if "DEBUG" in os.environ:
+            print("Debug mode is on - no login storing")
+            return
         try:
             with open(USER_TOKEN_PATH, "w") as handler:
                 json.dump(self.token.__dict__, handler)
@@ -183,6 +189,8 @@ class User(UserApi):
         """
         Restore user token from the file in homedir
         """
+        if "DEBUG" in os.environ:
+            raise RuntimeError("Debug mode is on - no login storing")
         if os.path.exists(USER_TOKEN_PATH):
             try:
                 with open(USER_TOKEN_PATH, "r") as handler:
