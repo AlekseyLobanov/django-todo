@@ -61,8 +61,9 @@ class ToDoItemWidget(tk.Frame):
 
 
 class ToDoListWidget(tk.Frame):
-    def __init__(self, *args, **argv):
+    def __init__(self, *args, delete_list, **argv):
         super().__init__(*args, **argv)
+        self.delete_list = delete_list
 
     def fill(self, itemList):
 
@@ -82,7 +83,7 @@ class ToDoListWidget(tk.Frame):
         add = tk.Button(self, text="Добавить заметку", command=self.add_command)
         add.pack(side="top")
 
-        delete = tk.Button(self, text="Удалить лист", command=self.master.delete_list)
+        delete = tk.Button(self, text="Удалить лист", command=self.delete_list)
         delete.pack(side="top")
 
     def update(self, itemList=None):
@@ -169,19 +170,20 @@ class WorkSpaceFrame(tk.Frame):
         self.update_lists()
 
         # canvas for todo lists
-        # canvas = tk.Canvas(self)
-        # canvas.pack(side="left", fill="both", expand=1)
-        # scrollbar = tk.Scrollbar(self, orient="vertical")
-        # scrollbar.config(command=canvas.yview)
-        # scrollbar.pack(side="left", fill="y")
-        # canvas.configure(yscrollcommand=scrollbar.set)
+        canvas = tk.Canvas(self)
+        canvas.pack(side="left", fill="both", expand=1)
+        scrollbar = tk.Scrollbar(self, orient="vertical")
+        scrollbar.config(command=canvas.yview)
+        scrollbar.pack(side="left", fill="y")
+        canvas.configure(yscrollcommand=scrollbar.set)
 
         # todo lists
-        self.toDoList = ToDoListWidget(self)
+        self.toDoList = ToDoListWidget(self, delete_list=self.delete_list)
+        self.toDoList.grid_propagate(True)
         # self.toDoList = ToDoListWidget(canvas)
         self.toDoList.pack(side="left", fill="y")
-        # canvas.bind('<Configure>', lambda *argv: print(self.toDoList.winfo_height()))
-        # canvas.create_window((0,0), window=self.toDoList, anchor='nw')
+        canvas.bind("<Configure>", lambda *argv: canvas.configure(scrollregion=canvas.bbox("all")))
+        canvas.create_window((0, 0), window=self.toDoList, anchor="nw")
 
         # select list!
         if len(self.lists) > 0:
