@@ -82,7 +82,7 @@ class ToDoListWidget(tk.Frame):
         add = tk.Button(self, text="Добавить заметку", command=self.add_command)
         add.pack(side="top")
 
-        delete = tk.Button(self, text="Удалить лист", command=placeholder)
+        delete = tk.Button(self, text="Удалить лист", command=self.master.delete_list)
         delete.pack(side="top")
 
     def update(self, itemList=None):
@@ -106,6 +106,17 @@ class ToDoListWidget(tk.Frame):
 
 
 class WorkSpaceFrame(tk.Frame):
+    def delete_list(self, *args):
+        selection = self.listBox.curselection()
+        cur = selection[0]
+        self.user.removeUserList(self.lists[cur].id)
+        self.lists = self.user.fetchUserLists()
+        self.update_lists()
+        if len(self.lists) > 1:
+            self.listBox.selection_set(first=cur - 1)
+        elif len(self.lists) > 0:
+            self.listBox.selection_set(first=0)
+
     def __init__(self, user, master=None, url=None) -> None:
         """
         Функция инициаизации класса
@@ -154,16 +165,36 @@ class WorkSpaceFrame(tk.Frame):
         # add scroll bar to list box
         self.listBox.config(yscrollcommand=scrollbar.set)
 
-        # fill list box
+        # init list view
+        self.update_lists()
+
+        # canvas for todo lists
+        # canvas = tk.Canvas(self)
+        # canvas.pack(side="left", fill="both", expand=1)
+        # scrollbar = tk.Scrollbar(self, orient="vertical")
+        # scrollbar.config(command=canvas.yview)
+        # scrollbar.pack(side="left", fill="y")
+        # canvas.configure(yscrollcommand=scrollbar.set)
+
+        # todo lists
+        self.toDoList = ToDoListWidget(self)
+        # self.toDoList = ToDoListWidget(canvas)
+        self.toDoList.pack(side="left", fill="y")
+        # canvas.bind('<Configure>', lambda *argv: print(self.toDoList.winfo_height()))
+        # canvas.create_window((0,0), window=self.toDoList, anchor='nw')
+
+        # select list!
+        if len(self.lists) > 0:
+            self.listBox.selection_set(first=0)
+            self.listBox_selected()
+
+    def update_lists(self):
+        self.listBox.delete(0, "end")
         for item in self.lists:
             s = f"{str(item)}: {item.created_at.strftime('%Y-%m-%d %H:%M:%S')}"
             self.listBox.insert(tk.END, s)
         self.listBox.pack()
-        len(self.lists) > 0 and self.listBox.selection_set(first=0)
-
-        # todo lists
-        self.toToList = ToDoListWidget(self)
-        self.toToList.pack(side="left", fill="both", expand=1)
+        return len(self.lists)
 
     def add_list(self, *args):
         text = self.add_list_text.get(1.0, "end").strip()
@@ -174,18 +205,13 @@ class WorkSpaceFrame(tk.Frame):
         self.lists = self.user.fetchUserLists()
 
         # fill list box
-        self.listBox.delete(0, "end")
-        for item in self.lists:
-            s = f"{str(item)}: {item.created_at.strftime('%Y-%m-%d %H:%M:%S')}"
-            self.listBox.insert(tk.END, s)
-        self.listBox.pack()
-        len(self.lists) > 0 and self.listBox.selection_set(first=0)
+        self.update_lists()
+        len(self.lists) > 0 and self.listBox.selection_set(first=len(self.lists) - 1)
 
     def listBox_selected(self, *args):
-
-        self.toToList.clear()
+        self.toDoList.clear()
 
         selection = self.listBox.curselection()
         cur = selection[0]
 
-        self.toToList.fill(self.lists[cur])
+        self.toDoList.fill(self.lists[cur])

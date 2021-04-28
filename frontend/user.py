@@ -57,7 +57,7 @@ class ToDoList(object):
 
     def remove(self, index):
         """
-        Remove item at index from db
+        Remove item AT INDEX from db
         """
         item = self.items_[index]
         self.items_.remove(item)
@@ -85,10 +85,10 @@ class ToDoList(object):
 
     def dispose(self):
         print(f"To-do list id '{self.id}' is being disposed of...")
-        if "DEBUG" in os.environ:
-            return
         for item in self.items_:
             item.dispose()
+        if "DEBUG" in os.environ:
+            return
         self.user.lists_delete(self.id)
 
     def sync(self):
@@ -229,12 +229,12 @@ class User(UserApi):
 
     def removeUserList(self, id):
         """
-        Remove existing user to-do list from the serverreturns:
+        Remove existing user to-do list BY ID from the serverreturns:
         """
         to_remove = [item for item in self.lists_ if item.id == id][0]
         self.lists_.remove(to_remove)
-        if not ("DEBUG" in os.environ):
-            to_remove.dispose()
+        # if not ("DEBUG" in os.environ):
+        to_remove.dispose()
         return self.lists_
 
     def appendUserList(self, title):
