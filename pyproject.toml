@@ -21,3 +21,15 @@ exclude = '''
   | profiling
 )/
 '''
+
+[build-system]
+requires = [
+  "setuptools",
+  "wheel",
+  "requests",
+  "build",
+  "coverage",
+  "doit"
+]
+build-backend = "setuptools.build_meta"
+

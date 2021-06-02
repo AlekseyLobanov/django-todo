@@ -1,6 +1,6 @@
 import tkinter as tk
-from user import User
-import message
+from .user import User
+from . import message
 
 
 class LoginFrame(tk.Frame):

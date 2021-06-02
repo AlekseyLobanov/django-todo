@@ -67,3 +67,8 @@ target/
 tmp*
 .env*
 venv*
+
+# Doit
+*.bak
+*.dat
+*.dir

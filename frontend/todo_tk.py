@@ -2,9 +2,9 @@
 
 import sys
 import tkinter as tk
-from login import LoginFrame
-from workspace import WorkSpaceFrame
-from user import User
+from .login import LoginFrame
+from .workspace import WorkSpaceFrame
+from .user import User
 
 if "win" in sys.platform.lower():
     DEFAULT_URL = "http://localhost:8000"
