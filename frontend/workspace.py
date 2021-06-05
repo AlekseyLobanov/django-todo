@@ -1,4 +1,7 @@
+import gettext
 import tkinter as tk
+
+gettext.install("todo", localedir="po")
 
 
 def str_time(time):
@@ -11,7 +14,7 @@ TODO_ITEM_TABLE_CREATED_AT_WIDTH = 15
 
 
 def placeholder():
-    print("Не реализовано")
+    print(_("Не реализовано"))
 
 
 class ToDoItemWidget(tk.Frame):
@@ -19,13 +22,13 @@ class ToDoItemWidget(tk.Frame):
     def header(parent):
         body = tk.Frame(parent)
 
-        text = tk.Label(body, text="Текст", width=TODO_ITEM_TABLE_TEXT_WIDTH)
+        text = tk.Label(body, text=_("Текст"), width=TODO_ITEM_TABLE_TEXT_WIDTH)
         text.pack(side="left")
 
-        text = tk.Label(body, text="Выполнено", width=TODO_ITEM_TABLE_FINISHED_WIDTH)
+        text = tk.Label(body, text=_("Выполнено"), width=TODO_ITEM_TABLE_FINISHED_WIDTH)
         text.pack(side="left")
 
-        text = tk.Label(body, text="Создано", width=TODO_ITEM_TABLE_CREATED_AT_WIDTH)
+        text = tk.Label(body, text=_("Создано"), width=TODO_ITEM_TABLE_CREATED_AT_WIDTH)
         text.pack(side="left")
 
         return body
@@ -53,7 +56,9 @@ class ToDoItemWidget(tk.Frame):
         )
         self.createdAt.pack(side="left")
 
-        self.remove = tk.Button(self, text="Удалить", command=lambda: self.parent.remove(self.item))
+        self.remove = tk.Button(
+            self, text=_("Удалить"), command=lambda: self.parent.remove(self.item)
+        )
         self.remove.pack(side="left")
 
     def finishedButton_command(self):
@@ -80,10 +85,10 @@ class ToDoListWidget(tk.Frame):
         self.itemToAdd = tk.Text(self, width=15, height=1)
         self.itemToAdd.pack(side="top")
 
-        add = tk.Button(self, text="Добавить заметку", command=self.add_command)
+        add = tk.Button(self, text=_("Добавить заметку"), command=self.add_command)
         add.pack(side="top")
 
-        delete = tk.Button(self, text="Удалить лист", command=self.delete_list)
+        delete = tk.Button(self, text=_("Удалить лист"), command=self.delete_list)
         delete.pack(side="top")
 
     def update(self, itemList=None):
@@ -141,7 +146,7 @@ class WorkSpaceFrame(tk.Frame):
 
         # Запомнить пользователя
         self.rbtn_var = tk.IntVar(value=1)
-        rbtn = tk.Checkbutton(self, text="Запомнить меня", variable=self.rbtn_var, command=None)
+        rbtn = tk.Checkbutton(self, text=_("Запомнить меня"), variable=self.rbtn_var, command=None)
         rbtn.pack(anchor="n")
 
         # data
@@ -150,7 +155,7 @@ class WorkSpaceFrame(tk.Frame):
         self.add_list_text = tk.Text(self, width=15, height=1)
         self.add_list_text.pack(anchor="sw")
 
-        add = tk.Button(self, text="Добавить лист", command=self.add_list)
+        add = tk.Button(self, text=_("Добавить лист"), command=self.add_list)
         add.pack(anchor="sw")
 
         # select list box

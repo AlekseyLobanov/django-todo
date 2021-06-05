@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
 
+import gettext
 import sys
 import tkinter as tk
 from login import LoginFrame
 from workspace import WorkSpaceFrame
 from user import User
+
+gettext.install("todo", localedir="po")
 
 if "win" in sys.platform.lower():
     DEFAULT_URL = "http://localhost:8000"
@@ -14,7 +17,7 @@ else:
 BASE_W = 600
 BASE_H = 400
 
-TITLE_APP = "ToDo Application"
+TITLE_APP = _("Приложение для планирования")
 
 
 class Application(tk.Tk):
@@ -50,7 +53,6 @@ class Application(tk.Tk):
     def center_window(self, width: str = BASE_W, heigh: str = BASE_H) -> None:
         """
         Центрирует приложение по центру экрана
-
         :param width: ширина окна
         :param heigh: высота окна
         """
