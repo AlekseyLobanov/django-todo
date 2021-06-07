@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 
 import gettext
+import os
 import sys
 import tkinter as tk
 from login import LoginFrame
 from workspace import WorkSpaceFrame
 from user import User
 
-gettext.install("todo", localedir="po")
+gettext.install("todo", os.path.join(os.path.dirname(__file__), "po"))
 
 if "win" in sys.platform.lower():
     DEFAULT_URL = "http://localhost:8000"

@@ -1,7 +1,8 @@
 import gettext
+import os
 import tkinter as tk
 
-gettext.install("todo", localedir="po")
+gettext.install("todo", os.path.join(os.path.dirname(__file__), "po"))
 
 
 def str_time(time):

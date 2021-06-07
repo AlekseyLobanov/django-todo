@@ -1,7 +1,8 @@
-from tkinter import messagebox as mb
 import gettext
+import os
+from tkinter import messagebox as mb
 
-gettext.install("todo", localedir="po")
+gettext.install("todo", os.path.join(os.path.dirname(__file__), "po"))
 
 TITLE_INFO_BOX = _("Сообщение!")
 MESSAGE_INVALID_LOGIN = _("Неправильный логин или пароль")

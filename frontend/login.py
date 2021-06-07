@@ -1,9 +1,10 @@
 import gettext
+import os
 import tkinter as tk
 from user import User
 import message
 
-gettext.install("todo", localedir="po")
+gettext.install("todo", os.path.join(os.path.dirname(__file__), "po"))
 
 
 class LoginFrame(tk.Frame):
