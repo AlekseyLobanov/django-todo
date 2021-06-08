@@ -32,8 +32,14 @@
 
 ## Как запустить проект
 ### Frontend
+Интерфейс на русском языке
 ```bash
 python3 todo_tk.py
+```
+
+Интерфейс на английском языке
+```bash
+LANG=eng python3 todo_tk.py
 ```
 
 ### backend

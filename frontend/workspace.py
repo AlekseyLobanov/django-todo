@@ -1,60 +1,65 @@
+import gettext
+import os
 import tkinter as tk
+
+gettext.install("todo", os.path.join(os.path.dirname(__file__), "po"))
 
 
 def str_time(time):
     return time.strftime("%Y-%m-%d %H:%M:%S")
 
 
-TODO_ITEM_TABLE_TEXT_WIDTH = 15
-TODO_ITEM_TABLE_FINISHED_WIDTH = 8
-TODO_ITEM_TABLE_CREATED_AT_WIDTH = 15
+TODO_ITEM_TABLE_TEXT_WIDTH = 25
+TODO_ITEM_TABLE_FINISHED_WIDTH = 20
+
+TODO_ITEM_TABLE_CREATED_AT_WIDTH = 25
 
 
 def placeholder():
-    print("Не реализовано")
+    print(_("Не реализовано"))
 
 
 class ToDoItemWidget(tk.Frame):
-    @staticmethod
-    def header(parent):
-        body = tk.Frame(parent)
-
-        text = tk.Label(body, text="Текст", width=TODO_ITEM_TABLE_TEXT_WIDTH)
-        text.pack(side="left")
-
-        text = tk.Label(body, text="Выполнено", width=TODO_ITEM_TABLE_FINISHED_WIDTH)
-        text.pack(side="left")
-
-        text = tk.Label(body, text="Создано", width=TODO_ITEM_TABLE_CREATED_AT_WIDTH)
-        text.pack(side="left")
-
-        return body
-
-    def __init__(self, *args, item, **argv):
+    def __init__(self, *args, row_number, item, table, **argv):
         super().__init__(*args, **argv)
 
         self.parent = self.master
         self.item = item
 
-        self.noteLabel = tk.Label(self, text=item.text, width=TODO_ITEM_TABLE_TEXT_WIDTH)
-        self.noteLabel.pack(side="left")
+        self.noteLabel = tk.Label(
+            table,
+            text=item.text,
+            width=TODO_ITEM_TABLE_TEXT_WIDTH,
+            justify="center",
+            font=("Arial", 8),
+        )
+        self.noteLabel.grid(row=row_number, column=0)
 
         self.finished = tk.IntVar(value=int(item.finished))
         self.finishedButton = tk.Checkbutton(
-            self,
+            table,
             variable=self.finished,
             command=self.finishedButton_command,
             width=TODO_ITEM_TABLE_FINISHED_WIDTH,
+            justify="center",
         )
-        self.finishedButton.pack(side="left")
+        self.finishedButton.grid(row=row_number, column=1)
 
         self.createdAt = tk.Label(
-            self, text=str_time(item.created_at), width=TODO_ITEM_TABLE_CREATED_AT_WIDTH
+            table,
+            text=str_time(item.created_at),
+            width=TODO_ITEM_TABLE_CREATED_AT_WIDTH,
+            justify="center",
         )
-        self.createdAt.pack(side="left")
+        self.createdAt.grid(row=row_number, column=2)
 
-        self.remove = tk.Button(self, text="Удалить", command=lambda: self.parent.remove(self.item))
-        self.remove.pack(side="left")
+        self.remove = tk.Button(
+            table,
+            text=_("Удалить"),
+            command=lambda: self.parent.remove(self.item),
+            justify="center",
+        )
+        self.remove.grid(row=row_number, column=3)
 
     def finishedButton_command(self):
         self.item.modify(finished=self.finished.get() > 0)
@@ -65,26 +70,69 @@ class ToDoListWidget(tk.Frame):
         super().__init__(*args, **argv)
         self.delete_list = delete_list
 
-    def fill(self, itemList):
+    def create_table_header(self, body):
 
-        header = ToDoItemWidget.header(self)
-        header.pack(side="left")
-        header.pack(side="top", fill="y")
+        header_font = ("Arial", "10", "bold")
+        text = tk.Label(
+            body,
+            text=_("Текст"),
+            width=TODO_ITEM_TABLE_TEXT_WIDTH,
+            justify="center",
+            font=header_font,
+        )
+        text.grid(row=0, column=0)
+
+        done = tk.Label(
+            body,
+            text=_("Выполнено"),
+            width=TODO_ITEM_TABLE_FINISHED_WIDTH,
+            justify="center",
+            font=header_font,
+        )
+        done.grid(row=0, column=1)
+
+        created = tk.Label(
+            body,
+            text=_("Создано"),
+            width=TODO_ITEM_TABLE_CREATED_AT_WIDTH,
+            justify="center",
+            font=header_font,
+        )
+        created.grid(row=0, column=2)
+
+    def create_table(self, itemList):
+        table = tk.LabelFrame(self, relief=tk.GROOVE)
+        table.grid()
+        self.create_table_header(table)
 
         self.itemList = itemList
-
+        row_number = 1
         for item in itemList:
-            item = ToDoItemWidget(self, item=item)
-            item.pack(side="top", fill="y")
+            item = ToDoItemWidget(self, row_number=row_number, item=item, table=table)
+            row_number += 1
+        return table
 
-        self.itemToAdd = tk.Text(self, width=15, height=1)
-        self.itemToAdd.pack(side="top")
+    def create_new_item(self):
+        table = tk.LabelFrame(self, relief=tk.GROOVE)
+        table.grid()
+        self.itemToAdd = tk.Text(table, width=15, height=1)
+        self.itemToAdd.grid(row=0, column=0)
 
-        add = tk.Button(self, text="Добавить заметку", command=self.add_command)
-        add.pack(side="top")
+        add = tk.Button(table, text=_("Добавить заметку"), command=self.add_command)
+        add.grid(row=0, column=1)
+        return table
 
-        delete = tk.Button(self, text="Удалить лист", command=self.delete_list)
-        delete.pack(side="top")
+    def fill(self, itemList):
+        self.frame = tk.LabelFrame(self, relief=tk.GROOVE)
+        self.frame.grid(sticky="NEWS")
+        table = self.create_table(itemList)
+        table.grid(row=0, column=0)
+
+        new = self.create_new_item()
+        new.grid(row=2, column=0)
+
+        delete = tk.Button(self, text=_("Удалить лист"), command=self.delete_list)
+        delete.grid(row=4, column=0)
 
     def update(self, itemList=None):
         self.clear()
@@ -141,7 +189,7 @@ class WorkSpaceFrame(tk.Frame):
 
         # Запомнить пользователя
         self.rbtn_var = tk.IntVar(value=1)
-        rbtn = tk.Checkbutton(self, text="Запомнить меня", variable=self.rbtn_var, command=None)
+        rbtn = tk.Checkbutton(self, text=_("Запомнить меня"), variable=self.rbtn_var, command=None)
         rbtn.pack(anchor="n")
 
         # data
@@ -150,7 +198,7 @@ class WorkSpaceFrame(tk.Frame):
         self.add_list_text = tk.Text(self, width=15, height=1)
         self.add_list_text.pack(anchor="sw")
 
-        add = tk.Button(self, text="Добавить лист", command=self.add_list)
+        add = tk.Button(self, text=_("Добавить лист"), command=self.add_list)
         add.pack(anchor="sw")
 
         # select list box

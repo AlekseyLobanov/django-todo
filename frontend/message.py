@@ -1,8 +1,12 @@
+import gettext
+import os
 from tkinter import messagebox as mb
 
-TITLE_INFO_BOX = "Сообщение!"
-MESSAGE_INVALID_LOGIN = "Неправильный логин или пароль"
-MESSAGE_EMPTY = "Сдесь могло быть ваше сообщение"
+gettext.install("todo", os.path.join(os.path.dirname(__file__), "po"))
+
+TITLE_INFO_BOX = _("Сообщение!")
+MESSAGE_INVALID_LOGIN = _("Неправильный логин или пароль")
+MESSAGE_EMPTY = _("Сдесь могло быть ваше сообщение")
 
 
 def infobox(msg: str = None) -> None:
