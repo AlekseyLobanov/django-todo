@@ -1,8 +1,8 @@
 import gettext
 import os
 import tkinter as tk
-from user import User
-import message
+from .user import User
+from . import message
 
 gettext.install("todo", os.path.join(os.path.dirname(__file__), "po"))
 

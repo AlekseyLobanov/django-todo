@@ -7,7 +7,7 @@ from pathlib import Path
 
 import json
 
-from api import UserApi
+from .api import UserApi
 
 LIST_UPDATEBLE = ["title"]
 TODO_ITEM_UPDATEBLE = ["text", "finished"]

@@ -4,9 +4,9 @@ import gettext
 import os
 import sys
 import tkinter as tk
-from login import LoginFrame
-from workspace import WorkSpaceFrame
-from user import User
+from .login import LoginFrame
+from .workspace import WorkSpaceFrame
+from .user import User
 
 gettext.install("todo", os.path.join(os.path.dirname(__file__), "po"))
 
