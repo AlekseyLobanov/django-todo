@@ -1,6 +1,10 @@
+import gettext
+import os
 import tkinter as tk
 from .user import User
 from . import message
+
+gettext.install("todo", os.path.join(os.path.dirname(__file__), "po"))
 
 
 class LoginFrame(tk.Frame):
@@ -57,21 +61,22 @@ class LoginFrame(tk.Frame):
             tk.Grid.columnconfigure(self, columns, weight=1)
 
         # Подпись и поле ввода для логина
-        login_label = tk.Label(self, text="Введите логин")
+        t = _("Введите логин")
+        login_label = tk.Label(self, text=t)
         login_label.grid(row=9, column=12, columnspan=3, rowspan=1, sticky="nsew")
 
         self.login = tk.Entry(self)
         self.login.grid(row=10, column=12, columnspan=3, rowspan=1, sticky="nsew")
 
         # Подпись и поле ввода для пароля
-        password_label = tk.Label(self, text="Введите пароль")
+        password_label = tk.Label(self, text=_("Введите пароль"))
         password_label.grid(row=11, column=12, columnspan=3, rowspan=1, sticky="nsew")
 
         self.password = tk.Entry(self, show="*")
         self.password.grid(row=12, column=12, columnspan=3, rowspan=1, sticky="nsew")
 
         # Кнопка авториазции
-        btn = tk.Button(self, text="Войти", command=self.login_clicked)
+        btn = tk.Button(self, text=_("Войти"), command=self.login_clicked)
         btn.grid(row=14, column=12, columnspan=3, rowspan=1, sticky="nsew")
 
         # Если захочется реализовать в логине
