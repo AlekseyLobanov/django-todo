@@ -34,12 +34,12 @@
 ### Frontend
 Интерфейс на русском языке
 ```bash
-python3 todo_tk.py
+python3 -m frontend
 ```
 
 Интерфейс на английском языке
 ```bash
-LANG=eng python3 todo_tk.py
+LANG=eng python3 -m frontend
 ```
 
 ### backend
